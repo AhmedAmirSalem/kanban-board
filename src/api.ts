@@ -16,3 +16,8 @@ export async function createTask(input: Omit<Task, "id">) {
 export async function deleteTask(id: string) {
   await api.delete(`/tasks/${id}`);
 }
+
+export async function updateTask(id: string, partial: Partial<Task>) {
+  const { data } = await api.patch(`/tasks/${id}`, partial);
+  return data as Task;
+}
