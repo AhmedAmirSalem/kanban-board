@@ -3,21 +3,22 @@ import type { Task } from "./types";
 
 const api = axios.create({ baseURL: "http://localhost:4000" });
 
-export async function getTasksByColumn(params: { column: Task["column"]; q: string }) {
+export async function getTasksByColumn(params: { column: Task["column"] }) {
+  // prefer server sort; json-server supports _sort by a single field
   const { data } = await api.get<Task[]>("/tasks", {
-    params: {
-      column: params.column,
-      q: params.q || undefined,
-      _sort: "createdAt",
-      _order: "desc"
-    }
+    params: { column: params.column, _sort: "order", _order: "desc" }
   });
-  // backfill createdAt in case old rows exist
-  return data.map(t => ({ ...t, createdAt: t.createdAt ?? 0 }));
+  // backfill for legacy rows
+  return data.map(t => ({
+    ...t,
+    createdAt: t.createdAt ?? 0,
+    order: t.order ?? t.createdAt ?? 0
+  }));
 }
 
-export async function createTask(input: Omit<Task, "id" | "createdAt">) {
-  const payload = { ...input, createdAt: Date.now() };
+export async function createTask(input: Omit<Task, "id" | "createdAt" | "order">) {
+  const now = Date.now();
+  const payload = { ...input, createdAt: now, order: now };
   const { data } = await api.post("/tasks", payload);
   return data as Task;
 }

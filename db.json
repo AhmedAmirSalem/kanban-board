@@ -1,32 +1,3 @@
 {
-  "tasks": [
-    {
-      "id": "28ed",
-      "title": "auth flow research",
-      "description": "",
-      "column": "backlog",
-      "createdAt": 1762216341797
-    },
-    {
-      "id": "bc18",
-      "title": "auth login screen",
-      "description": "",
-      "column": "in-progress",
-      "createdAt": 1762216379386
-    },
-    {
-      "id": "3087",
-      "title": "refactor api flow",
-      "description": "",
-      "column": "done",
-      "createdAt": 1762216387342
-    },
-    {
-      "id": "8928",
-      "title": "design hero section",
-      "description": "",
-      "column": "review",
-      "createdAt": 1762216397809
-    }
-  ]
+  "tasks": []
 }
