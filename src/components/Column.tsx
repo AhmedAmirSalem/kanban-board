@@ -3,8 +3,9 @@ import {
   SortableContext,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { useTasksByColumn } from "../hooks/useTasksByColumn";
+import { Paper, Typography, Stack, Divider } from "@mui/material";
 import TaskCard from "./TaskCard";
+import { useTasksByColumn } from "../hooks/useTasksByColumn";
 import type { Task } from "../types";
 
 type Props = { title: string; column: Task["column"]; search: string };
@@ -16,39 +17,36 @@ export default function Column({ title, column, search }: Props) {
     data: { type: "column" },
   });
 
-  if (query.isLoading)
-    return (
-      <div className="column">
-        <h3>{title}</h3>Loading…
-      </div>
-    );
-  if (query.error)
-    return (
-      <div className="column">
-        <h3>{title}</h3>Error
-      </div>
-    );
-
   const ids = (query.data ?? []).map((t) => t.id);
 
   return (
-    <div
+    <Paper
+      variant="outlined"
+      sx={{
+        p: 2,
+        borderRadius: 2,
+        bgcolor: isOver ? "grey.50" : "background.paper",
+      }}
       ref={setNodeRef}
-      className="column"
-      style={{ background: isOver ? "#f2fbff" : undefined }}
     >
-      <h3>{title}</h3>
+      <Typography variant="h6" fontWeight={700} mb={2}>
+        {title}
+      </Typography>
+
       <SortableContext
         id={column}
         items={ids}
         strategy={verticalListSortingStrategy}
       >
-        <div className="column-scroll">
+        <Stack
+          spacing={2}
+          divider={<Divider flexItem sx={{ display: "none" }} />}
+        >
           {query.data?.map((t) => (
             <TaskCard key={t.id} task={t} />
           ))}
-        </div>
+        </Stack>
       </SortableContext>
-    </div>
+    </Paper>
   );
 }

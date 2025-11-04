@@ -1,3 +1,44 @@
 {
-  "tasks": []
+  "tasks": [
+    {
+      "id": "602b",
+      "title": "New task",
+      "description": "",
+      "column": "review",
+      "createdAt": 1762288826208,
+      "order": 1762298074179
+    },
+    {
+      "id": "d136",
+      "title": "New task",
+      "description": "",
+      "column": "done",
+      "createdAt": 1762288834036,
+      "order": 1762288846809
+    },
+    {
+      "id": "6d0a",
+      "title": "New task",
+      "description": "",
+      "column": "in-progress",
+      "createdAt": 1762288834722,
+      "order": 1762298076724
+    },
+    {
+      "id": "5e4e",
+      "title": "New task",
+      "description": "",
+      "column": "backlog",
+      "createdAt": 1762288835327,
+      "order": 1762288849288
+    },
+    {
+      "id": "6720",
+      "title": "New task",
+      "description": "",
+      "column": "backlog",
+      "createdAt": 1762288914090,
+      "order": 1762288914090
+    }
+  ]
 }
