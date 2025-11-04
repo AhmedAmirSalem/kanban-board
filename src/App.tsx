@@ -1,79 +1,83 @@
-import { useEffect, useState } from "react";
-import { getTasks, createTask, deleteTask, updateTask } from "./api";
+import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { createTask, deleteTask, updateTask } from "./api";
 import type { Task } from "./types";
 import Column from "./Column";
+import SearchBar from "./components/Searchbar";
+import { useDebounce } from "./hooks/useDebounce";
 
 export default function App() {
-  const [tasks, setTasks] = useState<Task[]>([]);
+  const qc = useQueryClient();
   const [title, setTitle] = useState("");
-
-  useEffect(() => {
-    getTasks().then(setTasks);
-  }, []);
+  const [search, setSearch] = useState("");
+  const debounced = useDebounce(search, 350);
 
   async function addTask() {
     if (!title.trim()) return;
-    const newTask = await createTask({
-      title,
-      description: "",
-      column: "backlog",
-    });
-    setTasks((prev) => [...prev, newTask]);
+    await createTask({ title, description: "", column: "backlog" });
     setTitle("");
+    // new items appear in backlog; invalidate that column with current search
+    qc.invalidateQueries({ queryKey: ["tasks", "backlog", debounced] });
   }
 
   async function removeTask(id: string) {
     await deleteTask(id);
-    setTasks((prev) => prev.filter((t) => t.id !== id));
+    // invalidate all visible columns for current search
+    ["backlog", "in-progress", "review", "done"].forEach((c) =>
+      qc.invalidateQueries({ queryKey: ["tasks", c, debounced] })
+    );
   }
 
   async function moveTask(id: string, to: Task["column"]) {
-    const updated = await updateTask(id, { column: to });
-    setTasks((prev) => prev.map((t) => (t.id === id ? updated : t)));
+    await updateTask(id, { column: to });
+    // safest: invalidate all columns in view for this search
+    ["backlog", "in-progress", "review", "done"].forEach((c) =>
+      qc.invalidateQueries({ queryKey: ["tasks", c, debounced] })
+    );
   }
-
-  const backlog = tasks.filter((t) => t.column === "backlog");
-  const inProgress = tasks.filter((t) => t.column === "in-progress");
-  const review = tasks.filter((t) => t.column === "review");
-  const done = tasks.filter((t) => t.column === "done");
 
   return (
     <div style={{ padding: 24 }}>
       <h2>Kanban Board</h2>
 
-      <input
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-        placeholder="task title"
-      />
-      <button onClick={addTask}>Add</button>
+      <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
+        <input
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          placeholder="task title"
+          style={{ padding: 8 }}
+        />
+        <button onClick={addTask}>Add</button>
+      </div>
 
-      <div style={{ display: "flex", marginTop: 20 }}>
+      <SearchBar value={search} onChange={setSearch} />
+
+      <div style={{ display: "flex", marginTop: 12 }}>
         <Column
           title="Backlog"
           column="backlog"
-          tasks={backlog}
+          search={debounced}
           onDelete={removeTask}
           onMove={moveTask}
         />
         <Column
           title="In Progress"
           column="in-progress"
-          tasks={inProgress}
+          search={debounced}
           onDelete={removeTask}
           onMove={moveTask}
         />
         <Column
           title="Review"
           column="review"
-          tasks={review}
+          search={debounced}
           onDelete={removeTask}
           onMove={moveTask}
         />
         <Column
           title="Done"
           column="done"
-          tasks={done}
+          search={debounced}
           onDelete={removeTask}
           onMove={moveTask}
         />

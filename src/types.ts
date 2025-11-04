@@ -3,4 +3,5 @@ export type Task = {
   title: string;
   description: string;
   column: "backlog" | "in-progress" | "review" | "done";
+  createdAt: number;
 };
