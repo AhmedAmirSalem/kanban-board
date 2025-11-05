@@ -1,13 +1,13 @@
-import { useState } from "react";
 import Container from "@mui/material/Container";
 import Box from "@mui/material/Box";
-import Grid from "@mui/material/Grid";
-
+import Grid from "@mui/material/Grid"; // v2 with `size={{}}`
 import { DndContext, closestCenter } from "@dnd-kit/core";
 
 import SearchBar from "./components/SearchBar";
+import AddTaskDialog from "./components/AddTaskDialog";
 import Column from "./components/Column";
 
+import { useState } from "react";
 import { useDebounce } from "./hooks/useDebounce";
 import { useTaskSort } from "./hooks/useTaskSort";
 import { useCreateTask } from "./hooks/useCreateTask";
@@ -15,13 +15,17 @@ import { useCreateTask } from "./hooks/useCreateTask";
 export default function App() {
   const [search, setSearch] = useState("");
   const debounced = useDebounce(search, 300);
-
   const { sensors, onDragEnd } = useTaskSort(debounced);
+
+  const [open, setOpen] = useState(false);
   const create = useCreateTask();
 
-  async function onAdd() {
-    if (create.isPending) return;
-    await create.mutateAsync({ title: "New task", column: "backlog" });
+  async function handleCreate(input: {
+    title: string;
+    description: string;
+    column: any;
+  }) {
+    await create.mutateAsync(input);
   }
 
   return (
@@ -30,8 +34,8 @@ export default function App() {
         <SearchBar
           search={search}
           onSearch={setSearch}
-          onAdd={onAdd}
-          adding={create.isPending}
+          onOpenCreate={() => setOpen(true)}
+          creating={create.isPending}
         />
       </Box>
 
@@ -59,6 +63,12 @@ export default function App() {
           </Grid>
         </Grid>
       </DndContext>
+
+      <AddTaskDialog
+        open={open}
+        onClose={() => setOpen(false)}
+        onCreate={handleCreate}
+      />
     </Container>
   );
 }

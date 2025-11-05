@@ -4,23 +4,23 @@ import SearchIcon from "@mui/icons-material/Search";
 type Props = {
   search: string;
   onSearch(v: string): void;
-  onAdd(): void;
-  adding?: boolean;
+  onOpenCreate(): void;
+  creating?: boolean;
 };
 
-export default function SearchBar({ search, onSearch, onAdd, adding }: Props) {
+export default function SearchBar({
+  search,
+  onSearch,
+  onOpenCreate,
+  creating,
+}: Props) {
   return (
-    <Stack
-      direction="row"
-      alignItems="center"
-      spacing={2}
-      sx={{ p: 2, borderRadius: 2, bgcolor: "background.paper" }}
-    >
+    <Stack direction="row" spacing={2} alignItems="center">
       <TextField
         fullWidth
-        placeholder="Search by task title or description"
         value={search}
         onChange={(e) => onSearch(e.target.value)}
+        placeholder="Search by task title or description"
         size="medium"
         InputProps={{
           startAdornment: (
@@ -29,15 +29,18 @@ export default function SearchBar({ search, onSearch, onAdd, adding }: Props) {
             </InputAdornment>
           ),
         }}
+        sx={{
+          "& .MuiOutlinedInput-root": { borderRadius: 3 },
+        }}
       />
       <Button
         variant="contained"
         disableElevation
-        onClick={onAdd}
-        disabled={adding}
-        sx={{ px: 3, borderRadius: 2 }}
+        onClick={onOpenCreate}
+        disabled={creating}
+        sx={{ px: 3, borderRadius: 3 }}
       >
-        {adding ? "Adding…" : "Add Task"}
+        {creating ? "Adding…" : "Add Task"}
       </Button>
     </Stack>
   );

@@ -19,8 +19,8 @@ export async function getTasksByColumn(params: { column: Task["column"] }) {
 export async function createTask(input: Omit<Task, "id" | "createdAt" | "order">) {
   const now = Date.now();
   const payload = { ...input, createdAt: now, order: now };
-  const { data } = await api.post("/tasks", payload);
-  return data as Task;
+  const { data } = await api.post<Task>("/tasks", payload);
+  return data;
 }
 
 export async function updateTask(id: string, partial: Partial<Task>) {
